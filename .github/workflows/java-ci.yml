@@ -9,13 +9,16 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: [17, 21]
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: ${{ matrix.java-version }}
       - name: Compile
         run: |
           mkdir -p bin
@@ -23,7 +26,14 @@ jobs:
       - name: Smoke run
         run: |
           echo 0 | java -cp bin com.apex.Main
-      - name: Package
+      - name: Package JAR
         run: |
           mkdir -p dist
-          cp -r bin dist/
+          printf "Main-Class: com.apex.Main\n" > manifest.txt
+          jar cfm dist/apexvault-${{ matrix.java-version }}.jar manifest.txt -C bin .
+          rm -f manifest.txt
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: apexvault-${{ matrix.java-version }}.jar
+          path: dist/*.jar
