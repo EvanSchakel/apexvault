@@ -7,8 +7,19 @@
     <artifactId>apexvault</artifactId>
     <version>0.1.0</version>
     <name>ApexVault</name>
-    <description>Terminal-first personal finance manager in Java</description>
+    <description>A lightning-fast, terminal-first personal finance manager built in pure Java.</description>
     <url>https://github.com/EvanSchakel/apexvault</url>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/EvanSchakel/apexvault/issues</url>
+    </issueManagement>
+
+    <scm>
+        <connection>scm:git:git://github.com/EvanSchakel/apexvault.git</connection>
+        <developerConnection>scm:git:ssh://github.com:EvanSchakel/apexvault.git</developerConnection>
+        <url>http://github.com/EvanSchakel/apexvault/tree/main</url>
+    </scm>
 
     <licenses>
         <license>
@@ -41,6 +52,8 @@
     </dependencies>
 
     <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <testSourceDirectory>src/test/java</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
