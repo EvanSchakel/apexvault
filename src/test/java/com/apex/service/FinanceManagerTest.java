@@ -60,4 +60,28 @@ class FinanceManagerTest {
         assertFalse(budgets.isEmpty());
         assertEquals("Food", budgets.get(0).getCategory());
     }
+
+    @Test
+    void testZeroBudgetLimit() {
+        InMemoryPersistence p = new InMemoryPersistence();
+        FinanceManager m = new FinanceManager(p);
+
+        m.setBudget("ZeroLimit", BigDecimal.ZERO);
+        List<Budget> budgets = m.getAllBudgets();
+        assertFalse(budgets.isEmpty());
+        assertEquals("ZeroLimit", budgets.get(0).getCategory());
+        assertEquals(0, budgets.get(0).getLimit().compareTo(BigDecimal.ZERO));
+    }
+
+    @Test
+    void testNegativeTransactionAmount() {
+        InMemoryPersistence p = new InMemoryPersistence();
+        FinanceManager m = new FinanceManager(p);
+
+        // App logic may prevent this from UI, but service should process negative numbers fine
+        m.addTransaction(new Transaction(LocalDate.now(), "Reversal", new BigDecimal("-10.00"), "Misc", TransactionType.EXPENSE));
+
+        BigDecimal balance = m.getTotalBalance();
+        assertEquals(0, balance.compareTo(new BigDecimal("10.00"))); // 0 - (-10) = 10
+    }
 }

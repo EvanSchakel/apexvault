@@ -10,22 +10,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FilePersistenceService implements PersistenceService {
-    private static final String DATA_DIR = "data/";
-    private static final String TX_FILE = DATA_DIR + "transactions.csv";
-    private static final String BUDGET_FILE = DATA_DIR + "budgets.csv";
+    private final String dataDir;
+    private final String txFile;
+    private final String budgetFile;
 
     public FilePersistenceService() {
-        File dir = new File(DATA_DIR);
+        this("data/");
+    }
+
+    public FilePersistenceService(String dataDir) {
+        this.dataDir = dataDir;
+        this.txFile = dataDir + "transactions.csv";
+        this.budgetFile = dataDir + "budgets.csv";
+
+        File dir = new File(this.dataDir);
         if (!dir.exists()) dir.mkdirs();
     }
 
     @Override
     public void saveTransactions(List<Transaction> transactions) {
-        try (PrintWriter out = new PrintWriter(new FileWriter(TX_FILE))) {
+        try (PrintWriter out = new PrintWriter(new FileWriter(txFile))) {
             for (Transaction t : transactions) {
+                String safeDesc = t.getDescription().replace(",", " ");
+                String safeCat = t.getCategory().replace(",", " ");
                 out.printf("%s,%s,%s,%s,%s,%s%n",
-                        t.getId(), t.getDate(), t.getDescription(),
-                        t.getAmount(), t.getCategory(), t.getType());
+                        t.getId(), t.getDate(), safeDesc,
+                        t.getAmount(), safeCat, t.getType());
             }
         } catch (IOException e) {
             System.err.println("Error saving transactions: " + e.getMessage());
@@ -35,7 +45,7 @@ public class FilePersistenceService implements PersistenceService {
     @Override
     public List<Transaction> loadTransactions() {
         List<Transaction> list = new ArrayList<>();
-        File file = new File(TX_FILE);
+        File file = new File(txFile);
         if (!file.exists()) return list;
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -61,9 +71,10 @@ public class FilePersistenceService implements PersistenceService {
 
     @Override
     public void saveBudgets(List<Budget> budgets) {
-        try (PrintWriter out = new PrintWriter(new FileWriter(BUDGET_FILE))) {
+        try (PrintWriter out = new PrintWriter(new FileWriter(budgetFile))) {
             for (Budget b : budgets) {
-                out.printf("%s,%s%n", b.getCategory(), b.getLimit());
+                String safeCat = b.getCategory().replace(",", " ");
+                out.printf("%s,%s%n", safeCat, b.getLimit());
             }
         } catch (IOException e) {
             System.err.println("Error saving budgets: " + e.getMessage());
@@ -73,7 +84,7 @@ public class FilePersistenceService implements PersistenceService {
     @Override
     public List<Budget> loadBudgets() {
         List<Budget> list = new ArrayList<>();
-        File file = new File(BUDGET_FILE);
+        File file = new File(budgetFile);
         if (!file.exists()) return list;
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {

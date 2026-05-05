@@ -36,9 +36,20 @@ Using the bundled script:
 Manual (javac/java):
 
 ```bash
-javac -d bin $(find src -name "*.java")
+javac -d bin $(find src/com -name "*.java")
 java -cp bin com.apex.Main
 ```
+
+## Example User Flow
+
+Here's an example of how you might interact with ApexVault using the standard inputs:
+
+1. **Start the app:** `./run.sh`
+2. **Log an income:** Press `2`, enter amount `5000.00`, category `Salary`, and a description.
+3. **Set a budget:** Press `4`, enter category `Food`, and monthly limit `400.00`.
+4. **Log an expense:** Press `3`, enter amount `55.50`, category `Food`, and description `Groceries`.
+5. **View Dashboard:** Press `1` to see your current net balance and progress against your `Food` budget.
+6. **Exit:** Press `0`.
 
 Project layout
 

@@ -32,6 +32,7 @@ public class TerminalUI {
         System.out.println("3. Log Expense");
         System.out.println("4. Set Category Budget");
         System.out.println("5. Transaction History");
+        System.out.println("6. Help");
         System.out.println("0. Exit");
         System.out.print(YELLOW + "\nAction > " + RESET);
     }
@@ -53,13 +54,18 @@ public class TerminalUI {
     }
 
     private void printProgressBar(String label, BigDecimal spent, BigDecimal limit) {
+        System.out.printf("%-12s ", label);
+        if (limit.compareTo(BigDecimal.ZERO) == 0) {
+            System.out.printf("[       " + YELLOW + "NO LIMIT" + RESET + "       ] ($%,.0f / $%,.0f)\n", spent, limit);
+            return;
+        }
+
         double percent = spent.divide(limit, 4, RoundingMode.HALF_UP).doubleValue();
         int bars = (int) (percent * 20);
         if (bars > 20) bars = 20;
 
         String color = percent > 0.9 ? RED : (percent > 0.7 ? YELLOW : GREEN);
         
-        System.out.printf("%-12s ", label);
         System.out.print("[");
         for (int i = 0; i < 20; i++) {
             if (i < bars) System.out.print(color + "■" + RESET);

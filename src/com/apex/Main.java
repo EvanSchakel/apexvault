@@ -9,6 +9,7 @@ import com.apex.ui.TerminalUI;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Scanner;
+import com.apex.ui.InputHelper;
 
 public class Main {
     public static void main(String[] args) {
@@ -40,6 +41,9 @@ public class Main {
                     case "5":
                         ui.printTransactions(manager.getAllTransactions());
                         break;
+                    case "6":
+                        printHelp();
+                        break;
                     case "0":
                         System.out.println("Powering down ApexVault. Secure your assets.");
                         return;
@@ -52,23 +56,30 @@ public class Main {
         }
     }
 
-    private static void logTransaction(Scanner sc, TerminalUI ui, FinanceManager manager, TransactionType type) {
-        System.out.print("Amount: ");
-        BigDecimal amount = new BigDecimal(sc.nextLine());
-        System.out.print("Category: ");
-        String cat = sc.nextLine();
-        System.out.print("Description: ");
-        String desc = sc.nextLine();
+    private static void printHelp() {
+        System.out.println("\n--- APEX VAULT HELP ---");
+        System.out.println("1. View Dashboard      : Displays total balance and progress bars for budgets.");
+        System.out.println("2. Log Income          : Adds an income transaction. Enter positive amounts.");
+        System.out.println("3. Log Expense         : Adds an expense transaction. Enter positive amounts.");
+        System.out.println("4. Set Category Budget : Sets a maximum monthly limit for a specific category.");
+        System.out.println("5. Transaction History : Shows all logged transactions.");
+        System.out.println("6. Help                : Shows this help screen.");
+        System.out.println("0. Exit                : Closes the application safely.");
+    }
 
-        manager.addTransaction(new Transaction(LocalDate.now(), desc, amount, cat, type));
+    private static void logTransaction(Scanner sc, TerminalUI ui, FinanceManager manager, TransactionType type) {
+        BigDecimal amount = InputHelper.readBigDecimal(sc, ui, "Amount: ", false);
+        String cat = InputHelper.readString(sc, ui, "Category: ");
+        String desc = InputHelper.readString(sc, ui, "Description: ");
+        LocalDate date = InputHelper.readDate(sc, ui, "Date");
+
+        manager.addTransaction(new Transaction(date, desc, amount, cat, type));
         ui.showSuccess("Transaction logged.");
     }
 
     private static void setBudget(Scanner sc, TerminalUI ui, FinanceManager manager) {
-        System.out.print("Category: ");
-        String cat = sc.nextLine();
-        System.out.print("Monthly Limit: ");
-        BigDecimal limit = new BigDecimal(sc.nextLine());
+        String cat = InputHelper.readString(sc, ui, "Category: ");
+        BigDecimal limit = InputHelper.readBigDecimal(sc, ui, "Monthly Limit: ", false);
 
         manager.setBudget(cat, limit);
         ui.showSuccess("Budget updated for " + cat);
