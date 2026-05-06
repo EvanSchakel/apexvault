@@ -40,17 +40,18 @@ public class FinanceManager {
     }
 
     public BigDecimal getTotalBalance() {
-        BigDecimal income = transactions.stream()
-                .filter(t -> t.getType() == TransactionType.INCOME)
-                .map(Transaction::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        
-        BigDecimal expenses = transactions.stream()
-                .filter(t -> t.getType() == TransactionType.EXPENSE)
-                .map(Transaction::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        return income.subtract(expenses);
+        BigDecimal balance = BigDecimal.ZERO;
+        // Optimization: Single-pass imperative loop replaces two separate stream operations
+        // to calculate total balance without iterating over the collection twice,
+        // which improves performance and reduces overhead.
+        for (Transaction t : transactions) {
+            if (t.getType() == TransactionType.INCOME) {
+                balance = balance.add(t.getAmount());
+            } else if (t.getType() == TransactionType.EXPENSE) {
+                balance = balance.subtract(t.getAmount());
+            }
+        }
+        return balance;
     }
 
     public Map<String, BigDecimal> getSpendingByCategory() {
