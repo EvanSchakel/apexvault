@@ -28,7 +28,7 @@ public class FilePersistenceService implements PersistenceService {
                         t.getAmount(), t.getCategory(), t.getType());
             }
         } catch (IOException e) {
-            System.err.println("Error saving transactions: " + e.getMessage());
+            System.err.println("Error saving transactions to persistent storage.");
         }
     }
 
@@ -54,7 +54,7 @@ public class FilePersistenceService implements PersistenceService {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error loading transactions: " + e.getMessage());
+            System.err.println("Error loading transactions from persistent storage.");
         }
         return list;
     }
@@ -66,7 +66,7 @@ public class FilePersistenceService implements PersistenceService {
                 out.printf("%s,%s%n", b.getCategory(), b.getLimit());
             }
         } catch (IOException e) {
-            System.err.println("Error saving budgets: " + e.getMessage());
+            System.err.println("Error saving budgets to persistent storage.");
         }
     }
 
@@ -85,7 +85,7 @@ public class FilePersistenceService implements PersistenceService {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error loading budgets: " + e.getMessage());
+            System.err.println("Error loading budgets from persistent storage.");
         }
         return list;
     }

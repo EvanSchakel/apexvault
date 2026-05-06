@@ -47,7 +47,7 @@ public class Main {
                         ui.showError("Unknown command.");
                 }
             } catch (Exception e) {
-                ui.showError("An unexpected error occurred: " + e.getMessage());
+                ui.showError("An unexpected error occurred. Please check your input and try again.");
             }
         }
     }
