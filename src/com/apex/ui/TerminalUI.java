@@ -42,7 +42,7 @@ public class TerminalUI {
         
         System.out.println("\n--- Budget Status ---");
         if (budgets.isEmpty()) {
-            System.out.println("No budgets defined.");
+            System.out.println("No budgets defined. Set a category budget to see it here.");
         } else {
             for (Budget b : budgets) {
                 BigDecimal spent = spending.getOrDefault(b.getCategory(), BigDecimal.ZERO);
@@ -72,12 +72,16 @@ public class TerminalUI {
     public void printTransactions(List<Transaction> transactions) {
         System.out.println("\n" + CYAN + "ID       DATE       TYPE     AMOUNT     CATEGORY    DESC" + RESET);
         System.out.println("------------------------------------------------------------------");
-        for (Transaction t : transactions) {
-            String typeColor = t.getType() == TransactionType.INCOME ? GREEN : RED;
-            System.out.printf("%-8s %-10s %-8s %s$%,8.2f%s %-11s %s\n",
-                    t.getId(), t.getDate(), t.getType(), 
-                    typeColor, t.getAmount(), RESET,
-                    t.getCategory(), t.getDescription());
+        if (transactions.isEmpty()) {
+            System.out.println("No transactions logged yet. Log an income or expense to add some!");
+        } else {
+            for (Transaction t : transactions) {
+                String typeColor = t.getType() == TransactionType.INCOME ? GREEN : RED;
+                System.out.printf("%-8s %-10s %-8s %s$%,8.2f%s %-11s %s\n",
+                        t.getId(), t.getDate(), t.getType(),
+                        typeColor, t.getAmount(), RESET,
+                        t.getCategory(), t.getDescription());
+            }
         }
     }
 
