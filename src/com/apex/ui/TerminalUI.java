@@ -53,6 +53,10 @@ public class TerminalUI {
     }
 
     private void printProgressBar(String label, BigDecimal spent, BigDecimal limit) {
+        if (limit.compareTo(BigDecimal.ZERO) == 0) {
+            System.out.printf("%-12s [%20s] N/A%% ($%,.0f / $0)\n", label, "", spent);
+            return;
+        }
         double percent = spent.divide(limit, 4, RoundingMode.HALF_UP).doubleValue();
         int bars = (int) (percent * 20);
         if (bars > 20) bars = 20;
