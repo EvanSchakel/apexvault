@@ -5,9 +5,9 @@ import com.apex.model.Transaction;
 import com.apex.model.TransactionType;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class FinanceManager {
     private final List<Transaction> transactions;
@@ -40,25 +40,30 @@ public class FinanceManager {
     }
 
     public BigDecimal getTotalBalance() {
-        BigDecimal income = transactions.stream()
-                .filter(t -> t.getType() == TransactionType.INCOME)
-                .map(Transaction::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        
-        BigDecimal expenses = transactions.stream()
-                .filter(t -> t.getType() == TransactionType.EXPENSE)
-                .map(Transaction::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        return income.subtract(expenses);
+        // Optimization: Use single-pass imperative loop instead of two streams
+        // Benchmarks show loops are faster and use less memory in this context
+        BigDecimal balance = BigDecimal.ZERO;
+        for (Transaction t : transactions) {
+            if (t.getType() == TransactionType.INCOME) {
+                balance = balance.add(t.getAmount());
+            } else if (t.getType() == TransactionType.EXPENSE) {
+                balance = balance.subtract(t.getAmount());
+            }
+        }
+        return balance;
     }
 
     public Map<String, BigDecimal> getSpendingByCategory() {
-        return transactions.stream()
-                .filter(t -> t.getType() == TransactionType.EXPENSE)
-                .collect(Collectors.groupingBy(
-                        Transaction::getCategory,
-                        Collectors.reducing(BigDecimal.ZERO, Transaction::getAmount, BigDecimal::add)
-                ));
+        // Optimization: Use imperative loop with HashMap instead of stream groupings
+        Map<String, BigDecimal> spending = new HashMap<>();
+        for (Transaction t : transactions) {
+            if (t.getType() == TransactionType.EXPENSE) {
+                spending.put(
+                    t.getCategory(),
+                    spending.getOrDefault(t.getCategory(), BigDecimal.ZERO).add(t.getAmount())
+                );
+            }
+        }
+        return spending;
     }
 }
