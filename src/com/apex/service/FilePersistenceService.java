@@ -23,9 +23,10 @@ public class FilePersistenceService implements PersistenceService {
     public void saveTransactions(List<Transaction> transactions) {
         try (PrintWriter out = new PrintWriter(new FileWriter(TX_FILE))) {
             for (Transaction t : transactions) {
+                // Sanitize description and category to prevent CSV structure breakage and injection
                 out.printf("%s,%s,%s,%s,%s,%s%n",
-                        t.getId(), t.getDate(), t.getDescription(),
-                        t.getAmount(), t.getCategory(), t.getType());
+                        t.getId(), t.getDate(), sanitizeForCsv(t.getDescription()),
+                        t.getAmount(), sanitizeForCsv(t.getCategory()), t.getType());
             }
         } catch (IOException e) {
             System.err.println("Error saving transactions: " + e.getMessage());
@@ -63,11 +64,27 @@ public class FilePersistenceService implements PersistenceService {
     public void saveBudgets(List<Budget> budgets) {
         try (PrintWriter out = new PrintWriter(new FileWriter(BUDGET_FILE))) {
             for (Budget b : budgets) {
-                out.printf("%s,%s%n", b.getCategory(), b.getLimit());
+                // Sanitize category to prevent CSV structure breakage and injection
+                out.printf("%s,%s%n", sanitizeForCsv(b.getCategory()), b.getLimit());
             }
         } catch (IOException e) {
             System.err.println("Error saving budgets: " + e.getMessage());
         }
+    }
+
+    private String sanitizeForCsv(String input) {
+        if (input == null || input.isEmpty()) return input;
+
+        // Replace commas, newlines, and carriage returns to prevent CSV structure breakage
+        String sanitized = input.replace(",", " ").replace("\n", " ").replace("\r", " ");
+
+        // Prevent CSV Injection for formulas/commands
+        char firstChar = sanitized.charAt(0);
+        if (firstChar == '=' || firstChar == '+' || firstChar == '-' || firstChar == '@') {
+            sanitized = "'" + sanitized;
+        }
+
+        return sanitized;
     }
 
     @Override
