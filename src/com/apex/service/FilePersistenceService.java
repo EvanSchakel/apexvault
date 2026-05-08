@@ -53,7 +53,7 @@ public class FilePersistenceService implements PersistenceService {
                     ));
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException | java.time.format.DateTimeParseException | IllegalArgumentException e) {
             System.err.println("Error loading transactions: " + e.getMessage());
         }
         return list;
@@ -84,7 +84,7 @@ public class FilePersistenceService implements PersistenceService {
                     list.add(new Budget(parts[0], new BigDecimal(parts[1])));
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException | NumberFormatException e) {
             System.err.println("Error loading budgets: " + e.getMessage());
         }
         return list;
