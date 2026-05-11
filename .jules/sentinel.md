@@ -1,4 +1,4 @@
-## 2024-05-19 - Division by Zero in BigDecimal UI Logic
-**Vulnerability:** ArithmeticException due to Division by Zero during UI rendering when calculating progress bars with 0 limit budgets.
-**Learning:** `BigDecimal.divide()` throws ArithmeticException if the divisor is zero, unlike floating point primitives which might result in Infinity or NaN.
-**Prevention:** Always check `BigDecimal` divisors using `divisor.compareTo(BigDecimal.ZERO) == 0` before calling `divide()`.
+## 2025-02-13 - Prevent CSV Injection and Structural Breakage in File Persistence
+**Vulnerability:** User input strings written directly to CSV files were missing escaping, which could break the CSV structure if they contained commas or newlines. In addition, fields were vulnerable to CSV injection attacks if opened in spreadsheet software, since strings could begin with '=', '+', '-', or '@'.
+**Learning:** Standard library string-splitting logic is fragile for CSV handling. Since this app avoids third-party libraries, we must manually account for standard CSV vulnerabilities.
+**Prevention:** Always implement a sanitation helper (like `sanitizeCsv()`) for user-provided strings written to CSVs. It should substitute structural characters (commas, newlines) with safe alternatives (like spaces) and prepend a single quote to strings beginning with spreadsheet formula characters.
