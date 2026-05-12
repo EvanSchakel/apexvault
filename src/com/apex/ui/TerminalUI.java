@@ -42,7 +42,7 @@ public class TerminalUI {
         
         System.out.println("\n--- Budget Status ---");
         if (budgets.isEmpty()) {
-            System.out.println("No budgets defined.");
+            System.out.println("No budgets defined. (Press 4 from Command Center to Set Category Budget)");
         } else {
             for (Budget b : budgets) {
                 BigDecimal spent = spending.getOrDefault(b.getCategory(), BigDecimal.ZERO);
@@ -76,6 +76,11 @@ public class TerminalUI {
     }
 
     public void printTransactions(List<Transaction> transactions) {
+        if (transactions.isEmpty()) {
+            System.out.println("\nNo transactions logged. (Press 2 or 3 from Command Center to Log Income/Expense)");
+            return;
+        }
+
         System.out.println("\n" + CYAN + "ID       DATE       TYPE     AMOUNT     CATEGORY    DESC" + RESET);
         System.out.println("------------------------------------------------------------------");
         for (Transaction t : transactions) {
