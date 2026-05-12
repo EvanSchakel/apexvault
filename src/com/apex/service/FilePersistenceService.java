@@ -19,13 +19,24 @@ public class FilePersistenceService implements PersistenceService {
         if (!dir.exists()) dir.mkdirs();
     }
 
+    private String sanitizeForCsv(String input) {
+        if (input == null) return "";
+        // Replace commas and newlines to prevent structural breakage
+        String sanitized = input.replace(",", " ").replace("\n", " ").replace("\r", " ");
+        // Prepend single quote if it starts with special characters to prevent CSV injection
+        if (sanitized.startsWith("=") || sanitized.startsWith("+") || sanitized.startsWith("-") || sanitized.startsWith("@")) {
+            sanitized = "'" + sanitized;
+        }
+        return sanitized;
+    }
+
     @Override
     public void saveTransactions(List<Transaction> transactions) {
         try (PrintWriter out = new PrintWriter(new FileWriter(TX_FILE))) {
             for (Transaction t : transactions) {
                 out.printf("%s,%s,%s,%s,%s,%s%n",
-                        t.getId(), t.getDate(), t.getDescription(),
-                        t.getAmount(), t.getCategory(), t.getType());
+                        t.getId(), t.getDate(), sanitizeForCsv(t.getDescription()),
+                        t.getAmount(), sanitizeForCsv(t.getCategory()), t.getType());
             }
         } catch (IOException e) {
             System.err.println("Error saving transactions: " + e.getMessage());
@@ -63,7 +74,7 @@ public class FilePersistenceService implements PersistenceService {
     public void saveBudgets(List<Budget> budgets) {
         try (PrintWriter out = new PrintWriter(new FileWriter(BUDGET_FILE))) {
             for (Budget b : budgets) {
-                out.printf("%s,%s%n", b.getCategory(), b.getLimit());
+                out.printf("%s,%s%n", sanitizeForCsv(b.getCategory()), b.getLimit());
             }
         } catch (IOException e) {
             System.err.println("Error saving budgets: " + e.getMessage());
