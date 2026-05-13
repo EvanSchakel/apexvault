@@ -56,11 +56,13 @@ public class FinanceManager {
     }
 
     public Map<String, BigDecimal> getSpendingByCategory() {
-        return transactions.stream()
-                .filter(t -> t.getType() == TransactionType.EXPENSE)
-                .collect(Collectors.groupingBy(
-                        Transaction::getCategory,
-                        Collectors.reducing(BigDecimal.ZERO, Transaction::getAmount, BigDecimal::add)
-                ));
+        // Optimization: Single-pass imperative loop avoids stream overhead for aggregation.
+        Map<String, BigDecimal> spending = new java.util.HashMap<>();
+        for (Transaction t : transactions) {
+            if (t.getType() == TransactionType.EXPENSE) {
+                spending.merge(t.getCategory(), t.getAmount(), BigDecimal::add);
+            }
+        }
+        return spending;
     }
 }
