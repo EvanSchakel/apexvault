@@ -1,4 +1,4 @@
-## 2024-05-19 - Division by Zero in BigDecimal UI Logic
-**Vulnerability:** ArithmeticException due to Division by Zero during UI rendering when calculating progress bars with 0 limit budgets.
-**Learning:** `BigDecimal.divide()` throws ArithmeticException if the divisor is zero, unlike floating point primitives which might result in Infinity or NaN.
-**Prevention:** Always check `BigDecimal` divisors using `divisor.compareTo(BigDecimal.ZERO) == 0` before calling `divide()`.
+## 2026-05-17 - CSV Injection and Structure Breakage Fix
+**Vulnerability:** Unsanitized user inputs written to CSV, leading to formula injection risks (if opened in Excel) and file format corruption (if input contains commas/newlines).
+**Learning:** ApexVault writes CSVs manually with `String.format` / `printf` instead of using a library. Commas break `String.split(",")` on load.
+**Prevention:** Prepend `'` to inputs starting with `=`, `+`, `-`, or `@`. Replace `,` and `\n` in inputs with spaces.

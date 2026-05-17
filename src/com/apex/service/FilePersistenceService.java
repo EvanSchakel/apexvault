@@ -19,13 +19,22 @@ public class FilePersistenceService implements PersistenceService {
         if (!dir.exists()) dir.mkdirs();
     }
 
+    private String sanitize(String input) {
+        if (input == null) return "";
+        String s = input.replace(",", " ").replace("\n", " ").replace("\r", " ");
+        if (s.startsWith("=") || s.startsWith("+") || s.startsWith("-") || s.startsWith("@")) {
+            s = "'" + s;
+        }
+        return s;
+    }
+
     @Override
     public void saveTransactions(List<Transaction> transactions) {
         try (PrintWriter out = new PrintWriter(new FileWriter(TX_FILE))) {
             for (Transaction t : transactions) {
                 out.printf("%s,%s,%s,%s,%s,%s%n",
-                        t.getId(), t.getDate(), t.getDescription(),
-                        t.getAmount(), t.getCategory(), t.getType());
+                        t.getId(), t.getDate(), sanitize(t.getDescription()),
+                        t.getAmount(), sanitize(t.getCategory()), t.getType());
             }
         } catch (IOException e) {
             System.err.println("Error saving transactions: " + e.getMessage());
@@ -63,7 +72,7 @@ public class FilePersistenceService implements PersistenceService {
     public void saveBudgets(List<Budget> budgets) {
         try (PrintWriter out = new PrintWriter(new FileWriter(BUDGET_FILE))) {
             for (Budget b : budgets) {
-                out.printf("%s,%s%n", b.getCategory(), b.getLimit());
+                out.printf("%s,%s%n", sanitize(b.getCategory()), b.getLimit());
             }
         } catch (IOException e) {
             System.err.println("Error saving budgets: " + e.getMessage());
