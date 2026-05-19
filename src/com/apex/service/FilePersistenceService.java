@@ -21,11 +21,11 @@ public class FilePersistenceService implements PersistenceService {
 
     @Override
     public void saveTransactions(List<Transaction> transactions) {
-        try (PrintWriter out = new PrintWriter(new FileWriter(TX_FILE))) {
+        // Optimization: BufferedWriter with string concatenation is significantly faster than PrintWriter.printf()
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(TX_FILE))) {
             for (Transaction t : transactions) {
-                out.printf("%s,%s,%s,%s,%s,%s%n",
-                        t.getId(), t.getDate(), t.getDescription(),
-                        t.getAmount(), t.getCategory(), t.getType());
+                out.write(t.getId() + "," + t.getDate() + "," + t.getDescription() + "," +
+                        t.getAmount() + "," + t.getCategory() + "," + t.getType() + "\n");
             }
         } catch (IOException e) {
             System.err.println("Error saving transactions: " + e.getMessage());
@@ -61,9 +61,10 @@ public class FilePersistenceService implements PersistenceService {
 
     @Override
     public void saveBudgets(List<Budget> budgets) {
-        try (PrintWriter out = new PrintWriter(new FileWriter(BUDGET_FILE))) {
+        // Optimization: BufferedWriter with string concatenation is significantly faster than PrintWriter.printf()
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(BUDGET_FILE))) {
             for (Budget b : budgets) {
-                out.printf("%s,%s%n", b.getCategory(), b.getLimit());
+                out.write(b.getCategory() + "," + b.getLimit() + "\n");
             }
         } catch (IOException e) {
             System.err.println("Error saving budgets: " + e.getMessage());
